@@ -1,4 +1,10 @@
-import Board, Ship, 
+from Board import Board
+from Ship import Ship
+from SimulationResult import SimulationResult
+
+
+import functionalComponents
+import random, copy
 
 #Represents a game of battleship. Using a board of set ships, the engine will attempt to compute positions of the ships in an attempt to sink all the ships. The engine will determine how many turns have passed after all ships are sunk. The fewer the turns, the better the engine is.
 class BattleshipEngine: 
@@ -65,11 +71,11 @@ class BattleshipEngine:
                 print('Enter a starting coordinate for the ship:')
                 x = input('Enter x coordinate: ')
                 y = input('Enter y coordinate: ')
-                if(CoordinateString(x,y) in self.board.tileList and (self.board.tileList[CoordinateString(x,y)].code != self.board.missTileCode or self.board.tileList[CoordinateString(x,y)].code != self.board.hitTileCode)):
+                if(functionalComponents.CoordinateString(x,y) in self.board.tileList and (self.board.tileList[functionalComponents.CoordinateString(x,y)].code != self.board.missTileCode or self.board.tileList[functionalComponents.CoordinateString(x,y)].code != self.board.hitTileCode)):
                     break
             y = int(y)
 
-            self.board.AttackBoard(CoordinateString(x,y))
+            self.board.AttackBoard(functionalComponents.CoordinateString(x,y))
     
     #Attacks from an inital starting point left to right
     def HorizontalLinearAttackStrategy(self):        
@@ -80,17 +86,17 @@ class BattleshipEngine:
         startingChar = 'A'
         startingX = chr(ord(startingChar) + random.randint(0, self.board.size - 1))
         startingY = random.randint(0, self.board.size - 1)
-        coordinateList.append(CoordinateString(startingX, startingY))
-        self.board.AttackBoard(CoordinateString(startingX, startingY))
+        coordinateList.append(functionalComponents.CoordinateString(startingX, startingY))
+        self.board.AttackBoard(functionalComponents.CoordinateString(startingX, startingY))
         x = str(startingX)
         y = startingY
-        originalTile = self.board.tileList[CoordinateString(x, y)]
+        originalTile = self.board.tileList[functionalComponents.CoordinateString(x, y)]
 
         #loop until all the ships are sunk
         #calculate the next position to attack
         while(not self.board.CheckIfAllShipsSunk()):
             #self.board.PrintBoard()
-            currentTile = self.board.tileList[CoordinateString(x, y)]
+            currentTile = self.board.tileList[functionalComponents.CoordinateString(x, y)]
 
             if(not currentTile.hasEastTile and not currentTile.hasSouthTile):
                 x = startingChar
@@ -101,8 +107,8 @@ class BattleshipEngine:
             else:
                 y += 1
 
-            coordinateList.append(CoordinateString(x, y))
-            self.board.AttackBoard(CoordinateString(x,y))  
+            coordinateList.append(functionalComponents.CoordinateString(x, y))
+            self.board.AttackBoard(functionalComponents.CoordinateString(x,y))  
             moves += 1  
 
         return SimulationResult(self.board.initalTileListState, coordinateList, moves, "Horizontal Linear")  
@@ -116,17 +122,17 @@ class BattleshipEngine:
         startingChar = 'A'
         startingX = chr(ord(startingChar) + random.randint(0, self.board.size - 1))
         startingY = random.randint(0, self.board.size - 1)        
-        coordinateList.append(CoordinateString(startingX, startingY))
-        self.board.AttackBoard(CoordinateString(startingX, startingY))
+        coordinateList.append(functionalComponents.CoordinateString(startingX, startingY))
+        self.board.AttackBoard(functionalComponents.CoordinateString(startingX, startingY))
         x = str(startingX)
         y = startingY
-        originalTile = self.board.tileList[CoordinateString(x, y)]
+        originalTile = self.board.tileList[functionalComponents.CoordinateString(x, y)]
 
         #loop until all the ships are sunk
         #calculate the next position to attack
         while(not self.board.CheckIfAllShipsSunk()):
             #self.board.PrintBoard()
-            currentTile = self.board.tileList[CoordinateString(x, y)]
+            currentTile = self.board.tileList[functionalComponents.CoordinateString(x, y)]
 
             if(not currentTile.hasEastTile and not currentTile.hasSouthTile):
                 x = startingChar
@@ -138,8 +144,8 @@ class BattleshipEngine:
                 x = chr(ord(x) + 1)
 
 
-            coordinateList.append(CoordinateString(x, y))
-            self.board.AttackBoard(CoordinateString(x, y))  
+            coordinateList.append(functionalComponents.CoordinateString(x, y))
+            self.board.AttackBoard(functionalComponents.CoordinateString(x, y))  
             moves += 1  
 
         return SimulationResult(self.board.initalTileListState, coordinateList, moves, "Vertical Linear")
@@ -169,57 +175,53 @@ class BattleshipEngine:
                 initialCoordinate = currentCoordinate
             elif(checkNorth):
                 while(checkNorth):
-                    currentCoordinate = MoveCoordinateNorth(currentCoordinate)
+                    currentCoordinate = functionalComponents.MoveCoordinateNorth(currentCoordinate)
 
                     #attack with the generated coordinate
                     coordinateList.append(currentCoordinate)
                     availableCoordinates.remove(currentCoordinate)
                     self.board.AttackBoard(currentCoordinate) 
-                    checkNorth = self.board.tileList[currentCoordinate].hasNorthTile and MoveCoordinateNorth(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode
+                    checkNorth = self.board.tileList[currentCoordinate].hasNorthTile and functionalComponents.MoveCoordinateNorth(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode
                     moves += 1
-                    self.board.PrintBoard()
             elif(checkSouth):
                  while(checkSouth):
-                    currentCoordinate = MoveCoordinateSouth(currentCoordinate)
+                    currentCoordinate = functionalComponents.MoveCoordinateSouth(currentCoordinate)
                     
                     #attack with the generated coordinate
                     coordinateList.append(currentCoordinate)
                     availableCoordinates.remove(currentCoordinate)
                     self.board.AttackBoard(currentCoordinate)
-                    checkSouth = self.board.tileList[currentCoordinate].hasSouthTile and MoveCoordinateSouth(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode 
+                    checkSouth = self.board.tileList[currentCoordinate].hasSouthTile and functionalComponents.MoveCoordinateSouth(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode 
                     moves += 1
-                    self.board.PrintBoard()
             elif(checkWest):
                  while(checkWest):
-                    currentCoordinate = MoveCoordinateWest(currentCoordinate)
+                    currentCoordinate = functionalComponents.MoveCoordinateWest(currentCoordinate)
                     
                     #attack with the generated coordinate
                     coordinateList.append(currentCoordinate)
                     availableCoordinates.remove(currentCoordinate)
                     self.board.AttackBoard(currentCoordinate)  
-                    checkWest = self.board.tileList[currentCoordinate].hasWestTile and MoveCoordinateWest(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode
+                    checkWest = self.board.tileList[currentCoordinate].hasWestTile and functionalComponents.MoveCoordinateWest(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode
                     moves += 1
-                    self.board.PrintBoard()
             elif(checkEast):
                 while(checkEast):
-                    currentCoordinate = MoveCoordinateEast(currentCoordinate)
+                    currentCoordinate = functionalComponents.MoveCoordinateEast(currentCoordinate)
                     
                     #attack with the generated coordinate
                     coordinateList.append(currentCoordinate)
                     availableCoordinates.remove(currentCoordinate)
                     self.board.AttackBoard(currentCoordinate)  
-                    checkEast = self.board.tileList[currentCoordinate].hasEastTile and MoveCoordinateEast(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode
+                    checkEast = self.board.tileList[currentCoordinate].hasEastTile and functionalComponents.MoveCoordinateEast(currentCoordinate) in availableCoordinates and self.board.tileList[currentCoordinate].code != self.board.missTileCode
                     moves += 1
-                    self.board.PrintBoard()
 
             #set back to the original coordinate
             currentCoordinate = initialCoordinate
 
             #adjust check flags to the new coordinate
-            checkNorth = self.board.tileList[currentCoordinate].hasNorthTile and MoveCoordinateNorth(currentCoordinate) in availableCoordinates
-            checkSouth = self.board.tileList[currentCoordinate].hasSouthTile and MoveCoordinateSouth(currentCoordinate) in availableCoordinates
-            checkWest = self.board.tileList[currentCoordinate].hasWestTile and MoveCoordinateWest(currentCoordinate) in availableCoordinates
-            checkEast = self.board.tileList[currentCoordinate].hasEastTile and MoveCoordinateEast(currentCoordinate) in availableCoordinates
+            checkNorth = self.board.tileList[currentCoordinate].hasNorthTile and functionalComponents.MoveCoordinateNorth(currentCoordinate) in availableCoordinates
+            checkSouth = self.board.tileList[currentCoordinate].hasSouthTile and functionalComponents.MoveCoordinateSouth(currentCoordinate) in availableCoordinates
+            checkWest = self.board.tileList[currentCoordinate].hasWestTile and functionalComponents.MoveCoordinateWest(currentCoordinate) in availableCoordinates
+            checkEast = self.board.tileList[currentCoordinate].hasEastTile and functionalComponents.MoveCoordinateEast(currentCoordinate) in availableCoordinates
             
             #attack with the generated coordinate       
             if(currentCoordinate in availableCoordinates):
@@ -227,6 +229,6 @@ class BattleshipEngine:
                 availableCoordinates.remove(currentCoordinate)
                 self.board.AttackBoard(currentCoordinate)  
                 moves += 1 
-                self.board.PrintBoard()
         
         return SimulationResult(self.board.initalTileListState, coordinateList, moves, "Hitscan")
+   
