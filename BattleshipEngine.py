@@ -56,7 +56,7 @@ class BattleshipEngine:
     def DEVStartBattleshipSimulation(self, iterations):
         self.SetNewBoard()
         for x in range(0, iterations):
-            simulationResult = self.HitScanAttackStrategy()
+            simulationResult = self.DiagonalLinearAttackStrategy()
             self.simulationResuts[simulationResult.attackStrategy+'#'+str(x)] = simulationResult
             self.board.ResetBoard()
             
@@ -151,7 +151,7 @@ class BattleshipEngine:
         return SimulationResult(self.board.initalTileListState, coordinateList, moves, "Vertical Linear")
     
     #randomly attacks coordinates until a hit is registers. then attack each adjacent tile until each direction registers a miss or is off the board
-    def HitScanAttackStrategy(self):
+    def RandomHitScanAttackStrategy(self):
         coordinateList = []
         validCoordinateList = []
         moves = 0
@@ -232,3 +232,51 @@ class BattleshipEngine:
         
         return SimulationResult(self.board.initalTileListState, coordinateList, moves, "Hitscan")
    
+   #starts with a random tile on the board. moves diagonally, down and to the left after each attack.
+    def DiagonalLinearAttackStrategy(self):
+        coordinateList = []  
+        moves = 1
+
+        #calc starting point and make first attack
+        startingChar = 'A'
+        startingX = chr(ord(startingChar) + random.randint(0, self.board.size - 1))
+        startingY = random.randint(0, self.board.size - 1)
+        coordinateList.append(functionalComponents.CoordinateString(startingX, startingY))
+        self.board.AttackBoard(functionalComponents.CoordinateString(startingX, startingY))
+        x = str(startingX)
+        y = startingY
+        originalTile = self.board.tileList[functionalComponents.CoordinateString(x, y)]
+
+        #loop until all the ships are sunk
+        #calculate the next position to attack
+        while(not self.board.CheckIfAllShipsSunk()):
+            currentTile = self.board.tileList[functionalComponents.CoordinateString(x, y)]
+
+            if(not currentTile.hasWestTile and not currentTile.hasNorthTile):
+                x = startingChar
+                y += 1
+            elif(not currentTile.hasEastTile and not currentTile.hasSouthTile):
+                x = startingChar
+                y = 0
+            elif(not currentTile.hasWestTile and not currentTile.hasSouthTile):
+                x = chr(ord(startingChar) + 1)
+                y = self.board.size - 1
+            # elif(not currentTile.hasSouthTile):
+            #     x = chr(ord(startingChar)) + y + 1
+            #     y = self.board.size - 1
+            elif(not currentTile.hasSouthTile and functionalComponents.MoveCoordinateWest(currentTile.GetCoordiante()) != self.board.emptyTileCode):
+                x = chr(ord(startingChar) + y + 1)
+                y = self.board.size - 1 
+            elif(not currentTile.hasWestTile):
+                y = ord(x) - ord(startingChar) + 1
+                x = startingChar             
+            else:
+                x = chr(ord(x) + 1)
+                y -= 1
+
+
+            coordinateList.append(functionalComponents.CoordinateString(x, y))
+            self.board.AttackBoard(functionalComponents.CoordinateString(x,y))  
+            moves += 1  
+
+        return SimulationResult(self.board.initalTileListState, coordinateList, moves, "Diagonal Linear")  

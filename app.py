@@ -1,5 +1,4 @@
 from BattleshipEngine import BattleshipEngine
-from SimulationResult import SimulationResult
 
 engine = BattleshipEngine()
 engine.DEVStartBattleshipSimulation(10)
