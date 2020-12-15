@@ -8,4 +8,4 @@ class SimulationResult:
     
     def SimulationResultString(self):
         return self.attackStrategy + ' completed in ' + str(self.moves) + ' moves'
-           
+    
